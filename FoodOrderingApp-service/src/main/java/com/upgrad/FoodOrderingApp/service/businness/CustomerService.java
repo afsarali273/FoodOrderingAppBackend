@@ -51,15 +51,17 @@ public class CustomerService {
                     "SGR-002", "Invalid email-id format!");
 
         // Check for Valid contact number
-        if(!customerEntity.getEmail().matches("\\d{10}"))
+        if(!customerEntity.getContactNumber().matches("^\\d{10}$")){
             throw new SignUpRestrictedException(
                     "SGR-003", "Invalid contact number!");
+        }
 
         //Check for password weakness
         if(!customerEntity.getPassword().matches("^(?=.*[A-Z])(?=.*[#@$%&*!^])(?=.*[0-9])(?=.*[a-z]).{8,20}$"))
             throw new SignUpRestrictedException(
                     "SGR-004", "Weak password!");
 
+        // Encryption of Password before persisting to DB
         String[] encryptedText = passwordCryptographyProvider.encrypt(customerEntity.getPassword());
         customerEntity.setSalt(encryptedText[0]);
         customerEntity.setPassword(encryptedText[1]);
