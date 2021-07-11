@@ -6,6 +6,7 @@ import com.upgrad.FoodOrderingApp.api.model.SignupCustomerRequest;
 import com.upgrad.FoodOrderingApp.api.model.SignupCustomerResponse;
 import com.upgrad.FoodOrderingApp.api.model.UpdateCustomerRequest;
 import com.upgrad.FoodOrderingApp.api.model.UpdateCustomerResponse;
+import com.upgrad.FoodOrderingApp.api.model.UpdatePasswordRequest;
 import com.upgrad.FoodOrderingApp.service.businness.AuthenticationService;
 import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
@@ -21,6 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -33,6 +35,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/")
+@CrossOrigin
 public class CustomerController {
 
     @Autowired
@@ -144,6 +147,31 @@ public class CustomerController {
         UpdateCustomerResponse updateCustomerResponse = new UpdateCustomerResponse();
         updateCustomerResponse.setId(customer.getUuid());
         updateCustomerResponse.setStatus("CUSTOMER DETAILS UPDATED SUCCESSFULLY");
+        return new ResponseEntity<UpdateCustomerResponse>(updateCustomerResponse, HttpStatus.OK);
+    }
+
+    @RequestMapping(
+            method = RequestMethod.PUT,
+            path = "/customer/password",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<UpdateCustomerResponse> changePassword(
+            @RequestHeader("authorization") final String accessToken,
+            @RequestBody final UpdatePasswordRequest updatePasswordRequest)
+            throws AuthorizationFailedException, UpdateCustomerException {
+       CustomerAuthEntity customerAuthEntity = authenticationService.authenticate(accessToken);
+        CustomerEntity oldRecord = customerAuthEntity.getCustomer();
+
+        // Check old and new Password not empty
+        if (StringUtils.isEmpty(updatePasswordRequest.getOldPassword()) || StringUtils.isEmpty(updatePasswordRequest.getNewPassword()))
+            throw new UpdateCustomerException("UCR-003", "No field should be empty");
+
+        //Get Update response form Dao
+        CustomerEntity customer = customerService.updateCustomer(oldRecord,updatePasswordRequest.getOldPassword(),updatePasswordRequest.getNewPassword());
+
+        //UpdateResponse Object
+        UpdateCustomerResponse updateCustomerResponse = new UpdateCustomerResponse();
+        updateCustomerResponse.setId(customer.getUuid());
+        updateCustomerResponse.setStatus("CUSTOMER PASSWORD UPDATED SUCCESSFULLY");
         return new ResponseEntity<UpdateCustomerResponse>(updateCustomerResponse, HttpStatus.OK);
     }
 

@@ -93,4 +93,23 @@ public class CustomerService {
         customerDao.updateCustomer(customer);
         return customer;
     }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public CustomerEntity updateCustomer(
+           CustomerEntity oldCustomer, String oldPassword , String newPassword) throws UpdateCustomerException {
+
+        //Check for password weakness
+        if(!newPassword.matches("^(?=.*[A-Z])(?=.*[#@$%&*!^])(?=.*[0-9])(?=.*[a-z]).{8,20}$"))
+            throw new UpdateCustomerException("UCR-001", "Weak password!");
+
+        //Check Old password is correct
+        final String encryptedPassword = passwordCryptographyProvider.encrypt(oldPassword, oldCustomer.getSalt());
+        if(!encryptedPassword.equals(oldCustomer.getPassword()))
+            throw new UpdateCustomerException("UCR-004","Incorrect old password!");
+
+        //Setting new Password to existing customer
+        oldCustomer.setPassword(newPassword);
+        customerDao.updateCustomer(oldCustomer);
+        return oldCustomer;
+    }
 }
