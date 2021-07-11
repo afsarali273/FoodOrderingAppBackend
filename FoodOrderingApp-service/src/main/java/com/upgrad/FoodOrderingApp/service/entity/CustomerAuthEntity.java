@@ -75,7 +75,7 @@ public class CustomerAuthEntity implements Serializable {
         this.uuId = uuId;
     }
 
-    public CustomerEntity getCustomerEntity() {
+    public CustomerEntity getCustomer() {
         return customerEntity;
     }
 

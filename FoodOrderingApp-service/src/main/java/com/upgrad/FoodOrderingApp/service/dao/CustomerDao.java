@@ -42,4 +42,13 @@ public class CustomerDao {
             return null;
         }
     }
+
+    public CustomerAuthEntity createAuthToken(final CustomerAuthEntity customerAuthEntity) {
+        entityManager.persist(customerAuthEntity);
+        return customerAuthEntity;
+    }
+
+    public void updateCustomer(final CustomerEntity customerEntity) {
+        entityManager.merge(customerEntity);
+    }
 }
