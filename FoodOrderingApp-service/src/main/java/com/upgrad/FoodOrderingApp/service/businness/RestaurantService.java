@@ -43,7 +43,7 @@ public class RestaurantService {
   }
 
   /**
-   * G
+   * Gets Restaurants by Name
    *
    * @return List of RestaurantEntity
    */

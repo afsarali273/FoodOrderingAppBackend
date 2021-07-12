@@ -19,78 +19,57 @@ public class AuthenticationService {
 
   @Autowired private PasswordCryptographyProvider CryptographyProvider;
 
-  @Transactional(propagation = Propagation.REQUIRED)
-  public CustomerAuthEntity login(final String username, final String password) throws AuthenticationFailedException {
-    CustomerEntity customerEntity = customerDao.getCustomerByContactNumber(username);
-    if (customerEntity == null) {
-      throw new AuthenticationFailedException("ATH-001", "This contact number has not been registered!");
-    }
+//  @Transactional(propagation = Propagation.REQUIRED)
+//  public CustomerAuthEntity login(final String username, final String password) throws AuthenticationFailedException {
+//    CustomerEntity customerEntity = customerDao.getCustomerByContactNumber(username);
+//    if (customerEntity == null) {
+//      throw new AuthenticationFailedException("ATH-001", "This contact number has not been registered!");
+//    }
+//
+//    final String encryptedPassword = CryptographyProvider.encrypt(password, customerEntity.getSalt());
+//    if (encryptedPassword.equals(customerEntity.getPassword())) {
+//      JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(encryptedPassword);
+//      CustomerAuthEntity customerAuthEntity = new CustomerAuthEntity();
+//      customerAuthEntity.setCustomerEntity(customerEntity);
+//      customerAuthEntity.setUuId(customerEntity.getUuid());
+//      final ZonedDateTime now = ZonedDateTime.now();
+//      final ZonedDateTime expiresAt = now.plusHours(8);
+//
+//      customerAuthEntity.setAccessToken(
+//          jwtTokenProvider.generateToken(customerEntity.getUuid(), now, expiresAt));
+//
+//      customerAuthEntity.setLoginAt(now);
+//      customerAuthEntity.setExpiresAt(expiresAt);
+//
+//      customerDao.createAuthToken(customerAuthEntity);
+//      //customerDao.updateCustomer(customerEntity);
+//      return customerAuthEntity;
+//    } else {
+//      throw new AuthenticationFailedException("ATH-002", "Invalid Credentials");
+//    }
+//  }
 
-    final String encryptedPassword = CryptographyProvider.encrypt(password, customerEntity.getSalt());
-    if (encryptedPassword.equals(customerEntity.getPassword())) {
-      JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(encryptedPassword);
-      CustomerAuthEntity customerAuthEntity = new CustomerAuthEntity();
-      customerAuthEntity.setCustomerEntity(customerEntity);
-      customerAuthEntity.setUuId(customerEntity.getUuid());
-      final ZonedDateTime now = ZonedDateTime.now();
-      final ZonedDateTime expiresAt = now.plusHours(8);
 
-      customerAuthEntity.setAccessToken(
-          jwtTokenProvider.generateToken(customerEntity.getUuid(), now, expiresAt));
-
-      customerAuthEntity.setLoginAt(now);
-      customerAuthEntity.setExpiresAt(expiresAt);
-
-      customerDao.createAuthToken(customerAuthEntity);
-      //customerDao.updateCustomer(customerEntity);
-      return customerAuthEntity;
-    } else {
-      throw new AuthenticationFailedException("ATH-002", "Invalid Credentials");
-    }
-  }
-
-  @Transactional(propagation = Propagation.REQUIRED)
-  public CustomerAuthEntity logout(final String accessToken) throws AuthorizationFailedException {
-
-    CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthTokenEntity(accessToken);
-
-    //Check if customer is logged in
-    if (customerAuthEntity == null)
-      throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
-
-    //Check if Customer is logged out
-    if(customerAuthEntity.getLogoutAt() !=null)
-      throw new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint.");
-
-      //If Current time is exceeding 8 hours of Login then ,Session expired
-      if(ZonedDateTime.now().compareTo(customerAuthEntity.getExpiresAt()) > 0)
-        throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
-
-    final ZonedDateTime now = ZonedDateTime.now();
-    customerAuthEntity.setLogoutAt(now); //Set Logout At to Now
-    return customerAuthEntity;
-  }
-
-  @Transactional(propagation = Propagation.REQUIRED)
-  public CustomerAuthEntity authenticate(final String authorization)
-          throws AuthorizationFailedException{
-
-    CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthTokenEntity(authorization);
-
-    //Check if customer is logged in
-    if (customerAuthEntity == null)
-      throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
-
-    //Check if Customer is logged out
-    if(customerAuthEntity.getLogoutAt() !=null)
-      throw new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint.");
-
-    //If Current time is exceeding 8 hours of Login then ,Session expired
-    if(ZonedDateTime.now().compareTo(customerAuthEntity.getExpiresAt()) > 0)
-      throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
-
-    return customerAuthEntity;
-  }
+//  @Transactional(propagation = Propagation.REQUIRED)
+//  public CustomerAuthEntity getCustomer(final String authorization)
+//          throws AuthorizationFailedException{
+//
+//    CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthTokenEntity(authorization);
+//
+//    //Check if customer is logged in
+//    if (customerAuthEntity == null)
+//      throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
+//
+//    //Check if Customer is logged out
+//    if(customerAuthEntity.getLogoutAt() !=null)
+//      throw new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint.");
+//
+//    //If Current time is exceeding 8 hours of Login then ,Session expired
+//    if(ZonedDateTime.now().compareTo(customerAuthEntity.getExpiresAt()) > 0)
+//      throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
+//
+//    return customerAuthEntity;
+//  }
 //
 //  @Transactional(propagation = Propagation.REQUIRED)
 //  public UserAuthTokenEntity userProfile(String uuId, final String accessToken)

@@ -73,4 +73,8 @@ public class AddressService {
         return addressDao.deleteAddress(addressId);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    public AddressEntity getAddressByUUID(String addressId) {
+        return addressDao.findAddressById(addressId);
+    }
 }

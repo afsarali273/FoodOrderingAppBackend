@@ -128,139 +128,139 @@ public class CustomerControllerTest {
         verify(mockCustomerService, times(1)).saveCustomer(any());
     }
 
-//    // ----------------------------- POST /customer/login --------------------------------
-//
-//    //This test case passes when you are able to login successfully.
-//    @Test
-//    public void shouldLoginForValidRequest() throws Exception {
-//        final CustomerAuthEntity createdCustomerAuthEntity = new CustomerAuthEntity();
-//        createdCustomerAuthEntity.setAccessToken("accessToken");
-//        final CustomerEntity customerEntity = new CustomerEntity();
-//        final String customerId = UUID.randomUUID().toString();
-//        customerEntity.setUuid(customerId);
-//        createdCustomerAuthEntity.setCustomer(customerEntity);
-//
-//        when(mockCustomerService.authenticate("9090909090", "CorrectPassword"))
-//                .thenReturn(createdCustomerAuthEntity);
-//
-//        mockMvc
-//                .perform(post("/customer/login")
-//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-//                        .header("authorization", "Basic " + getEncoder().encodeToString("9090909090:CorrectPassword".getBytes())))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("id").value(customerId))
-//                .andExpect(header().exists("access-token"));
-//        verify(mockCustomerService, times(1)).authenticate("9090909090", "CorrectPassword");
-//    }
-//
-//    //This test case passes when you have handled the exception of trying to login with invalid authorization format.
-//    @Test
-//    public void shouldNotLoginForInvalidAuthorizationFormat() throws Exception {
-//        mockMvc
-//                .perform(post("/customer/login")
-//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-//                        .header("authorization", "Basic " + getEncoder().encodeToString(":".getBytes())))
-//                .andExpect(status().isUnauthorized())
-//                .andExpect(jsonPath("code").value("ATH-003"));
-//        verify(mockCustomerService, times(0)).authenticate(anyString(), anyString());
-//    }
-//
-//    //This test case passes when you have handled the exception of trying to login with a contact number that is not
-//    // registered yet.
-//    @Test
-//    public void shouldNotLoginIfNoDataPresentForGivenMobileNo() throws Exception {
-//        when(mockCustomerService.authenticate("123", "CorrectPassword"))
-//                .thenThrow(new AuthenticationFailedException("ATH-001", "This contact number does not exist"));
-//        mockMvc
-//                .perform(post("/customer/login")
-//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-//                        .header("authorization", "Basic " + getEncoder().encodeToString("123:CorrectPassword".getBytes())))
-//                .andExpect(status().isUnauthorized())
-//                .andExpect(jsonPath("code").value("ATH-001"));
-//        verify(mockCustomerService, times(1)).authenticate("123", "CorrectPassword");
-//    }
-//
-//    //This test case passes when you have handled the exception of trying to login with incorrect password.
-//    @Test
-//    public void shouldNotLoginForWrongPassword() throws Exception {
-//        when(mockCustomerService.authenticate("9090909090", "IncorrectPassword"))
-//                .thenThrow(new AuthenticationFailedException("ATH-002", "Password failed"));
-//        mockMvc
-//                .perform(post("/customer/login")
-//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-//                        .header("authorization", "Basic " + getEncoder().encodeToString("9090909090:IncorrectPassword".getBytes())))
-//                .andExpect(status().isUnauthorized())
-//                .andExpect(jsonPath("code").value("ATH-002"));
-//        verify(mockCustomerService, times(1)).authenticate("9090909090", "IncorrectPassword");
-//    }
-//
-//    // ----------------------------- POST /customer/logout --------------------------------
-//
-//    //This test case passes when you are able to logout successfully.
-//    @Test
-//    public void shouldLogoutForValidRequest() throws Exception {
-//        final CustomerAuthEntity createdCustomerAuthEntity = new CustomerAuthEntity();
-//        final CustomerEntity customerEntity = new CustomerEntity();
-//        final String customerId = UUID.randomUUID().toString();
-//        customerEntity.setUuid(customerId);
-//        createdCustomerAuthEntity.setCustomer(customerEntity);
-//        when(mockCustomerService.logout("access-token")).thenReturn(createdCustomerAuthEntity);
-//
-//        mockMvc
-//                .perform(post("/customer/logout")
-//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-//                        .header("authorization", "Bearer access-token"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("id").value(customerId));
-//        verify(mockCustomerService, times(1)).logout("access-token");
-//    }
-//
-//    //This test case passes when you have handled the exception of trying to logout without even logging in.
-//    @Test
-//    public void shouldNotLogoutWhenCustomerIsNotLoggedIn() throws Exception {
-//        when(mockCustomerService.logout("auth"))
-//                .thenThrow(new AuthorizationFailedException("ATHR-001", "Customer is not Logged in."));
-//
-//        mockMvc
-//                .perform(post("/customer/logout")
-//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-//                        .header("authorization", "Bearer auth"))
-//                .andExpect(status().isForbidden())
-//                .andExpect(jsonPath("code").value("ATHR-001"));
-//        verify(mockCustomerService, times(1)).logout("auth");
-//    }
-//
-//    //This test case passes when you have handled the exception of trying to logout when you have already logged out.
-//    @Test
-//    public void shouldNotLogoutIfCustomerIsAlreadyLoggedOut() throws Exception {
-//        when(mockCustomerService.logout("auth"))
-//                .thenThrow(new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint."));
-//
-//        mockMvc
-//                .perform(post("/customer/logout")
-//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-//                        .header("authorization", "Bearer auth"))
-//                .andExpect(status().isForbidden())
-//                .andExpect(jsonPath("code").value("ATHR-002"));
-//        verify(mockCustomerService, times(1)).logout("auth");
-//    }
-//
-//    //This test case passes when you have handled the exception of trying to logout while your session is already expired.
-//    @Test
-//    public void shouldNotLogoutIfSessionIsExpired() throws Exception {
-//        when(mockCustomerService.logout("auth"))
-//                .thenThrow(new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint."));
-//
-//        mockMvc
-//                .perform(post("/customer/logout")
-//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-//                        .header("authorization", "Bearer auth"))
-//                .andExpect(status().isForbidden())
-//                .andExpect(jsonPath("code").value("ATHR-003"));
-//        verify(mockCustomerService, times(1)).logout("auth");
-//    }
-//
-//    // ----------------------------- PUT /customer --------------------------------
+    // ----------------------------- POST /customer/login --------------------------------
+
+    //This test case passes when you are able to login successfully.
+    @Test
+    public void shouldLoginForValidRequest() throws Exception {
+        final CustomerAuthEntity createdCustomerAuthEntity = new CustomerAuthEntity();
+        createdCustomerAuthEntity.setAccessToken("accessToken");
+        final CustomerEntity customerEntity = new CustomerEntity();
+        final String customerId = UUID.randomUUID().toString();
+        customerEntity.setUuid(customerId);
+        createdCustomerAuthEntity.setCustomerEntity(customerEntity);
+
+        when(mockCustomerService.authenticate("9090909090", "CorrectPassword"))
+                .thenReturn(createdCustomerAuthEntity);
+
+        mockMvc
+                .perform(post("/customer/login")
+                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                        .header("authorization", "Basic " + getEncoder().encodeToString("9090909090:CorrectPassword".getBytes())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(customerId))
+                .andExpect(header().exists("access-token"));
+        verify(mockCustomerService, times(1)).authenticate("9090909090", "CorrectPassword");
+    }
+
+    //This test case passes when you have handled the exception of trying to login with invalid authorization format.
+    @Test
+    public void shouldNotLoginForInvalidAuthorizationFormat() throws Exception {
+        mockMvc
+                .perform(post("/customer/login")
+                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                        .header("authorization", "Basic " + getEncoder().encodeToString(":".getBytes())))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("code").value("ATH-003"));
+        verify(mockCustomerService, times(0)).authenticate(anyString(), anyString());
+    }
+
+    //This test case passes when you have handled the exception of trying to login with a contact number that is not
+    // registered yet.
+    @Test
+    public void shouldNotLoginIfNoDataPresentForGivenMobileNo() throws Exception {
+        when(mockCustomerService.authenticate("123", "CorrectPassword"))
+                .thenThrow(new AuthenticationFailedException("ATH-001", "This contact number does not exist"));
+        mockMvc
+                .perform(post("/customer/login")
+                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                        .header("authorization", "Basic " + getEncoder().encodeToString("123:CorrectPassword".getBytes())))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("code").value("ATH-001"));
+        verify(mockCustomerService, times(1)).authenticate("123", "CorrectPassword");
+    }
+
+    //This test case passes when you have handled the exception of trying to login with incorrect password.
+    @Test
+    public void shouldNotLoginForWrongPassword() throws Exception {
+        when(mockCustomerService.authenticate("9090909090", "IncorrectPassword"))
+                .thenThrow(new AuthenticationFailedException("ATH-002", "Password failed"));
+        mockMvc
+                .perform(post("/customer/login")
+                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                        .header("authorization", "Basic " + getEncoder().encodeToString("9090909090:IncorrectPassword".getBytes())))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("code").value("ATH-002"));
+        verify(mockCustomerService, times(1)).authenticate("9090909090", "IncorrectPassword");
+    }
+
+    // ----------------------------- POST /customer/logout --------------------------------
+
+    //This test case passes when you are able to logout successfully.
+    @Test
+    public void shouldLogoutForValidRequest() throws Exception {
+        final CustomerAuthEntity createdCustomerAuthEntity = new CustomerAuthEntity();
+        final CustomerEntity customerEntity = new CustomerEntity();
+        final String customerId = UUID.randomUUID().toString();
+        customerEntity.setUuid(customerId);
+        createdCustomerAuthEntity.setCustomerEntity(customerEntity);
+        when(mockCustomerService.logout("access-token")).thenReturn(createdCustomerAuthEntity);
+
+        mockMvc
+                .perform(post("/customer/logout")
+                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                        .header("authorization", "Bearer access-token"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(customerId));
+        verify(mockCustomerService, times(1)).logout("access-token");
+    }
+
+    //This test case passes when you have handled the exception of trying to logout without even logging in.
+    @Test
+    public void shouldNotLogoutWhenCustomerIsNotLoggedIn() throws Exception {
+        when(mockCustomerService.logout("auth"))
+                .thenThrow(new AuthorizationFailedException("ATHR-001", "Customer is not Logged in."));
+
+        mockMvc
+                .perform(post("/customer/logout")
+                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                        .header("authorization", "Bearer auth"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("code").value("ATHR-001"));
+        verify(mockCustomerService, times(1)).logout("auth");
+    }
+
+    //This test case passes when you have handled the exception of trying to logout when you have already logged out.
+    @Test
+    public void shouldNotLogoutIfCustomerIsAlreadyLoggedOut() throws Exception {
+        when(mockCustomerService.logout("auth"))
+                .thenThrow(new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint."));
+
+        mockMvc
+                .perform(post("/customer/logout")
+                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                        .header("authorization", "Bearer auth"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("code").value("ATHR-002"));
+        verify(mockCustomerService, times(1)).logout("auth");
+    }
+
+    //This test case passes when you have handled the exception of trying to logout while your session is already expired.
+    @Test
+    public void shouldNotLogoutIfSessionIsExpired() throws Exception {
+        when(mockCustomerService.logout("auth"))
+                .thenThrow(new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint."));
+
+        mockMvc
+                .perform(post("/customer/logout")
+                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                        .header("authorization", "Bearer auth"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("code").value("ATHR-003"));
+        verify(mockCustomerService, times(1)).logout("auth");
+    }
+
+    // ----------------------------- PUT /customer --------------------------------
 //
 //    //This test case passes when you are able to update customer details successfully.
 //    @Test
@@ -356,8 +356,8 @@ public class CustomerControllerTest {
 //        verify(mockCustomerService, times(1)).getCustomer("auth");
 //        verify(mockCustomerService, times(0)).updateCustomer(any());
 //    }
-//
-//    // ----------------------------- PUT /customer/password --------------------------------
+
+    // ----------------------------- PUT /customer/password --------------------------------
 //
 //    //This test case passes when you are able to update your password successfully.
 //    @Test
@@ -379,9 +379,9 @@ public class CustomerControllerTest {
 //        verify(mockCustomerService, times(1)).getCustomer("auth");
 //        verify(mockCustomerService, times(1)).updateCustomerPassword("oldPwd", "newPwd", customerEntity);
 //    }
-//
-//    //This test case passes when you have handled the exception of trying to update your password but your old password
-//    // field is empty.
+
+    //This test case passes when you have handled the exception of trying to update your password but your old password
+    // field is empty.
 //    @Test
 //    public void shouldNotUpdateCustomerPasswordIfOldPasswordIsEmpty() throws Exception {
 //        mockMvc
@@ -461,9 +461,9 @@ public class CustomerControllerTest {
 //        verify(mockCustomerService, times(1)).getCustomer("auth");
 //        verify(mockCustomerService, times(0)).updateCustomer(any());
 //    }
-//
-//    //This test case passes when you have handled the exception of trying to update your password while your new
-//    // password is weak.
+
+    //This test case passes when you have handled the exception of trying to update your password while your new
+    // password is weak.
 //    @Test
 //    public void shouldNotUpdateCustomerPasswordIfNewPasswordDoesNotFollowRecommendedPasswordFormat() throws Exception {
 //        final CustomerEntity customerEntity = new CustomerEntity();

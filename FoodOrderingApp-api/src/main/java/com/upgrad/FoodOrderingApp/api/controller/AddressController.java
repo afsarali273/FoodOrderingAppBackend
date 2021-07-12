@@ -10,8 +10,10 @@ import com.upgrad.FoodOrderingApp.api.model.StatesList;
 import com.upgrad.FoodOrderingApp.api.model.StatesListResponse;
 import com.upgrad.FoodOrderingApp.service.businness.AddressService;
 import com.upgrad.FoodOrderingApp.service.businness.AuthenticationService;
+import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
+import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.entity.StateEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AddressNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
@@ -44,6 +46,9 @@ public class AddressController {
     AuthenticationService authenticationService;
 
     @Autowired
+    CustomerService customerService;
+
+    @Autowired
     AddressService addressService;
 
     @RequestMapping(
@@ -54,7 +59,7 @@ public class AddressController {
             @RequestHeader("authorization") final String authorization, @RequestBody SaveAddressRequest saveAddressRequest) throws AuthorizationFailedException, SaveAddressException, SignUpRestrictedException, AddressNotFoundException {
 
         //Check user credentials
-        CustomerAuthEntity customerAuthEntity = authenticationService.authenticate(authorization);
+        CustomerAuthEntity customerAuthEntity = customerService.authenticate(authorization);
 
         //Check Empty Address fields
         if (StringUtils.isEmpty(saveAddressRequest.getCity()) ||
@@ -86,7 +91,7 @@ public class AddressController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException {
         //Check user credentials
-        authenticationService.authenticate(authorization);
+        customerService.authenticate(authorization);
 
         //Get All Addresses
         List<AddressEntity> addressEntities = addressService.getAllAddress();
@@ -125,7 +130,7 @@ public class AddressController {
             @PathVariable("address_id") final String addressId,
             @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, AddressNotFoundException {
         //Check user credentials
-        CustomerAuthEntity authEntity = authenticationService.authenticate(authorization);
+        CustomerAuthEntity authEntity = customerService.authenticate(authorization);
 
         AddressEntity addressEntity = addressService.deleteAddress(authEntity, addressId);
 
@@ -142,7 +147,6 @@ public class AddressController {
     public ResponseEntity<StatesListResponse> getAllStates() {
         //Get All Addresses
         List<StateEntity> states = addressService.getAllStates();
-
         List<StatesList> statesLists = new ArrayList<StatesList>();
 
         // Map Address Object with Address List

@@ -93,7 +93,7 @@ public class CustomerController {
 
         String[] decodedArray = decodedText.split(":");
         CustomerAuthEntity customerAuthEntity =
-                authenticationService.login(decodedArray[0], decodedArray[1]);
+                customerService.authenticate(decodedArray[0], decodedArray[1]);
 
         CustomerEntity customer = customerAuthEntity.getCustomer();
 
@@ -115,7 +115,7 @@ public class CustomerController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<LogoutResponse> logout(
             @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
-        CustomerAuthEntity customerAuthEntity = authenticationService.logout(authorization);
+        CustomerAuthEntity customerAuthEntity = customerService.logout(authorization);
         CustomerEntity user = customerAuthEntity.getCustomer();
         LogoutResponse logoutResponse =
                 new LogoutResponse().id(user.getUuid()).message("LOGGED OUT SUCCESSFULLY");
@@ -158,8 +158,7 @@ public class CustomerController {
             @RequestHeader("authorization") final String accessToken,
             @RequestBody final UpdatePasswordRequest updatePasswordRequest)
             throws AuthorizationFailedException, UpdateCustomerException {
-       CustomerAuthEntity customerAuthEntity = authenticationService.authenticate(accessToken);
-        CustomerEntity oldRecord = customerAuthEntity.getCustomer();
+        CustomerEntity oldRecord = customerService.getCustomer(accessToken);
 
         // Check old and new Password not empty
         if (StringUtils.isEmpty(updatePasswordRequest.getOldPassword()) || StringUtils.isEmpty(updatePasswordRequest.getNewPassword()))

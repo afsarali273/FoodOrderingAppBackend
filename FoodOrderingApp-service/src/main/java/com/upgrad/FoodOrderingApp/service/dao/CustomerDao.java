@@ -19,6 +19,16 @@ public class CustomerDao {
         return customerEntity;
     }
 
+    /**
+     * T authorization access token
+     *
+     * @param customerAuthEntity  new authorization will be
+     *     created
+     */
+    public void createCustomerAuthToken(CustomerAuthEntity customerAuthEntity) {
+        entityManager.persist(customerAuthEntity);
+    }
+
     // Retrieve Customer by using AccessToken
     public CustomerAuthEntity getCustomerAuthTokenEntity(String accessToken) {
         try {
