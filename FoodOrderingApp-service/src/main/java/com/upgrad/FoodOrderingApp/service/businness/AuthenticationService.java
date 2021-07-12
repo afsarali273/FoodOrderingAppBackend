@@ -42,7 +42,7 @@ public class AuthenticationService {
       customerAuthEntity.setExpiresAt(expiresAt);
 
       customerDao.createAuthToken(customerAuthEntity);
-      customerDao.updateCustomer(customerEntity);
+      //customerDao.updateCustomer(customerEntity);
       return customerAuthEntity;
     } else {
       throw new AuthenticationFailedException("ATH-002", "Invalid Credentials");
