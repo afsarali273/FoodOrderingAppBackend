@@ -266,10 +266,13 @@ public class RestaurantControllerTest {
                 .thenReturn(new CustomerEntity());
 
         final RestaurantEntity restaurantEntity = getRestaurantEntity();
-        when(mockRestaurantService.restaurantByUUID(restaurantId)).thenReturn(restaurantEntity);
+        final RestaurantEntity updatedRestaurantEntity = restaurantEntity;
+                updatedRestaurantEntity.setCustomerRating(4.5);
+                updatedRestaurantEntity.setUuid(restaurantId);
 
+        when(mockRestaurantService.restaurantByUUID(restaurantId)).thenReturn(restaurantEntity);
         when(mockRestaurantService.updateRestaurantRating(restaurantEntity, 4.5))
-                .thenReturn(new RestaurantEntity());
+                .thenReturn(updatedRestaurantEntity);
 
         mockMvc
                 .perform(put("/restaurant/" + restaurantId + "?customer_rating=4.5")

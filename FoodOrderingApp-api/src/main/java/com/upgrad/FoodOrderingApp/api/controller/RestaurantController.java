@@ -15,12 +15,10 @@ import com.upgrad.FoodOrderingApp.service.businness.RestaurantService;
 import com.upgrad.FoodOrderingApp.service.common.Utils;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CategoryEntity;
-import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.entity.ItemEntity;
 import com.upgrad.FoodOrderingApp.service.entity.RestaurantEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
-import com.upgrad.FoodOrderingApp.service.exception.CustomerNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.InvalidRatingException;
 import com.upgrad.FoodOrderingApp.service.exception.RestaurantNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -180,20 +178,12 @@ public class RestaurantController {
         RestaurantEntity updatedRestaurantEntity =
                 restaurantService.updateRestaurantRating(restaurantEntity, customerRating);
         RestaurantUpdatedResponse restaurantUpdatedResponse = new RestaurantUpdatedResponse();
-        restaurantUpdatedResponse.setId(UUID.fromString(updatedRestaurantEntity.getUuid()));
-        restaurantUpdatedResponse.setStatus("RESTAURANT RATING UPDATED SUCCESSFULLY");
+            restaurantUpdatedResponse.setId(UUID.fromString(updatedRestaurantEntity.getUuid()));
+            restaurantUpdatedResponse.setStatus("RESTAURANT RATING UPDATED SUCCESSFULLY");
 
         return new ResponseEntity<RestaurantUpdatedResponse>(restaurantUpdatedResponse, HttpStatus.OK);
     }
 
-//    when(mockCustomerService.getCustomer("database_accesstoken2"))
-//            .thenReturn(new CustomerEntity());
-//
-//    final RestaurantEntity restaurantEntity = getRestaurantEntity();
-//    when(mockRestaurantService.restaurantByUUID(restaurantId)).thenReturn(restaurantEntity);
-//
-//    when(mockRestaurantService.updateRestaurantRating(restaurantEntity, 4.5))
-//            .thenReturn(new RestaurantEntity());
 
     /**
      * @param allRestaurants
