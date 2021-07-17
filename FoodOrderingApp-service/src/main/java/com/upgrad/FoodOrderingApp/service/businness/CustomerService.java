@@ -24,22 +24,6 @@ public class CustomerService {
     @Autowired
     private PasswordCryptographyProvider passwordCryptographyProvider;
 
-//    @Transactional(propagation = Propagation.REQUIRED)
-//    public CustomerAuthEntity authenticate(final String authorization)
-//            throws AuthorizationFailedException {
-//        CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthTokenEntity(authorization);
-//
-//        // Check user is signed in
-//        if (customerAuthEntity == null)
-//            throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
-//
-//        // Check User is Signed Out
-//        if (customerAuthEntity.getLogoutAt() != null)
-//            throw new AuthorizationFailedException(
-//                    "ATHR-002", "Customer is logged out. Log in again to access this endpoint.");
-//        return customerAuthEntity;
-//    }
-
     /**
      *
      * @param username customers contactnumber will be the username.
