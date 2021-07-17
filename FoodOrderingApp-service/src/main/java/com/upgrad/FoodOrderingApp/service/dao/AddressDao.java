@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -22,8 +23,9 @@ public class AddressDao {
     }
 
     //Updating existing address
-    public void updateAddress(final AddressEntity addressEntity) {
+    public AddressEntity updateAddress(final AddressEntity addressEntity) {
         entityManager.merge(addressEntity);
+        return addressEntity;
     }
 
     // Get All Address
@@ -43,12 +45,30 @@ public class AddressDao {
         return addressEntity;
     }
 
-    public CustomerEntity getCustomerByAddressId(String addressUuid){
-      CustomerAddressEntity customerAddressEntity =   entityManager.
-              createNamedQuery("getCustomerAddressByAddressId", CustomerAddressEntity.class)
-                .setParameter("addressUuid",addressUuid)
-                .getSingleResult();
+//    public CustomerEntity getCustomerByAddressId(String addressUuid){
+//      CustomerAddressEntity customerAddressEntity =   entityManager.
+//              createNamedQuery("getCustomerAddressByAddressId", CustomerAddressEntity.class)
+//                .setParameter("addressUuid",addressUuid)
+//                .getSingleResult();
+//
+//       return customerAddressEntity.getCustomerEntity();
+//    }
 
-       return customerAddressEntity.getCustomerEntity();
+    /**
+     *
+     *
+     * @param customer
+     * @return List of CustomerAddressEntity type object.
+     */
+    public List<CustomerAddressEntity> customerAddressByCustomer(CustomerEntity customer) {
+        List<CustomerAddressEntity> addresses =
+                entityManager
+                        .createNamedQuery("customerAddressByCustomer", CustomerAddressEntity.class)
+                        .setParameter("customer", customer)
+                        .getResultList();
+        if (addresses == null) {
+            return Collections.emptyList();
+        }
+        return addresses;
     }
 }

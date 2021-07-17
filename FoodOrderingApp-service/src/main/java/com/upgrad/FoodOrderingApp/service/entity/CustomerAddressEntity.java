@@ -23,7 +23,8 @@ import java.util.Objects;
 @Entity
 @Table(name = "CUSTOMER_ADDRESS", schema = "public")
 @NamedQueries({
-        @NamedQuery(name = "getCustomerAddressByAddressId", query = "select c from CustomerAddressEntity c where c.addressEntity.uuid=:addressUuid")
+        @NamedQuery(name = "getCustomerAddressByAddressId", query = "select c from CustomerAddressEntity c where c.addressEntity.uuid=:addressUuid"),
+        @NamedQuery(name = "customerAddressByCustomer", query = "select c from CustomerAddressEntity c where c.customerEntity=:customer")
 })
 public class CustomerAddressEntity implements Serializable {
 

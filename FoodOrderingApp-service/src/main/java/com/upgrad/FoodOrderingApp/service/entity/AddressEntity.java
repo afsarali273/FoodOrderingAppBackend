@@ -126,6 +126,23 @@ public class AddressEntity implements Serializable {
         this.active = active;
     }
 
+    public AddressEntity() {}
+
+    public AddressEntity(
+            @Size(max = 200) @NotNull String uuid,
+            @Size(max = 255) String flatBuilNo,
+            @Size(max = 255) String locality,
+            @Size(max = 30) String city,
+            @Size(max = 30) String pincode,
+            StateEntity state) {
+        this.uuid = uuid;
+        this.flatBuilNumber = flatBuilNo;
+        this.locality = locality;
+        this.city = city;
+        this.pinCode = pincode;
+        this.stateEntity = state;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -138,4 +155,6 @@ public class AddressEntity implements Serializable {
     public int hashCode() {
         return Objects.hash(id, uuid, flatBuilNumber, locality, city, pinCode, stateEntity, active);
     }
+
+
 }

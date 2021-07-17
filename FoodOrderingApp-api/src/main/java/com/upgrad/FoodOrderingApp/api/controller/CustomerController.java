@@ -33,6 +33,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Base64;
 import java.util.UUID;
 
+import static com.upgrad.FoodOrderingApp.service.common.Utils.getTokenFromAuthorization;
+
 @RestController
 @RequestMapping("/")
 @CrossOrigin
@@ -115,13 +117,11 @@ public class CustomerController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<LogoutResponse> logout(
             @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
-        CustomerAuthEntity customerAuthEntity = customerService.logout(authorization);
-        CustomerEntity user = customerAuthEntity.getCustomer();
+        String accessToken = getTokenFromAuthorization(authorization);
+        CustomerAuthEntity customerAuthEntity = customerService.logout(accessToken);
         LogoutResponse logoutResponse =
-                new LogoutResponse().id(user.getUuid()).message("LOGGED OUT SUCCESSFULLY");
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("access-token", customerAuthEntity.getAccessToken());
-        return new ResponseEntity<LogoutResponse>(logoutResponse, headers, HttpStatus.OK);
+                new LogoutResponse().id(customerAuthEntity.getCustomer().getUuid()).message("LOGGED OUT SUCCESSFULLY");
+        return new ResponseEntity<LogoutResponse>(logoutResponse, HttpStatus.OK);
     }
 
     @RequestMapping(
@@ -129,19 +129,21 @@ public class CustomerController {
             path = "/customer",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UpdateCustomerResponse> update(
-            @RequestHeader("authorization") final String accessToken,
+            @RequestHeader("authorization") final String authorization,
             @RequestBody final UpdateCustomerRequest updateCustomerRequest)
             throws AuthorizationFailedException, UpdateCustomerException {
 
         if (StringUtils.isEmpty(updateCustomerRequest.getFirstName()))
             throw new UpdateCustomerException("UCR-002", "First name field should not be empty");
+        String accessToken = getTokenFromAuthorization(authorization);
+        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
+
         //Get Values from Request Body
-        CustomerEntity updatedCustomer = new CustomerEntity();
-        updatedCustomer.setFirstName(updateCustomerRequest.getFirstName());
-        updatedCustomer.setLastName(updateCustomerRequest.getLastName());
+        customerEntity.setFirstName(updateCustomerRequest.getFirstName());
+        customerEntity.setLastName(updateCustomerRequest.getLastName());
 
         //Get Update response form Dao
-        CustomerEntity customer = customerService.updateCustomer(accessToken, updatedCustomer);
+        CustomerEntity customer = customerService.updateCustomer(customerEntity);
 
         //UpdateResponse Object
         UpdateCustomerResponse updateCustomerResponse = new UpdateCustomerResponse();
@@ -155,17 +157,20 @@ public class CustomerController {
             path = "/customer/password",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UpdateCustomerResponse> changePassword(
-            @RequestHeader("authorization") final String accessToken,
+            @RequestHeader("authorization") final String authorization,
             @RequestBody final UpdatePasswordRequest updatePasswordRequest)
             throws AuthorizationFailedException, UpdateCustomerException {
-        CustomerEntity oldRecord = customerService.getCustomer(accessToken);
 
         // Check old and new Password not empty
         if (StringUtils.isEmpty(updatePasswordRequest.getOldPassword()) || StringUtils.isEmpty(updatePasswordRequest.getNewPassword()))
             throw new UpdateCustomerException("UCR-003", "No field should be empty");
 
+        // CustomerEntity oldRecord = customerService.getCustomer(accessToken);
+        String accessToken = getTokenFromAuthorization(authorization);
+        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
+
         //Get Update response form Dao
-        CustomerEntity customer = customerService.updateCustomer(oldRecord,updatePasswordRequest.getOldPassword(),updatePasswordRequest.getNewPassword());
+        CustomerEntity customer = customerService.updateCustomerPassword(updatePasswordRequest.getOldPassword(),updatePasswordRequest.getNewPassword(),customerEntity);
 
         //UpdateResponse Object
         UpdateCustomerResponse updateCustomerResponse = new UpdateCustomerResponse();
@@ -173,6 +178,5 @@ public class CustomerController {
         updateCustomerResponse.setStatus("CUSTOMER PASSWORD UPDATED SUCCESSFULLY");
         return new ResponseEntity<UpdateCustomerResponse>(updateCustomerResponse, HttpStatus.OK);
     }
-
 
 }

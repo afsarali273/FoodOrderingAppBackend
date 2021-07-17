@@ -12,8 +12,10 @@ import com.upgrad.FoodOrderingApp.service.businness.CategoryService;
 import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
 import com.upgrad.FoodOrderingApp.service.businness.ItemService;
 import com.upgrad.FoodOrderingApp.service.businness.RestaurantService;
+import com.upgrad.FoodOrderingApp.service.common.Utils;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CategoryEntity;
+import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.entity.ItemEntity;
 import com.upgrad.FoodOrderingApp.service.entity.RestaurantEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
@@ -36,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static java.util.UUID.fromString;
 
@@ -168,17 +171,29 @@ public class RestaurantController {
             @RequestHeader("authorization") final String authorization,
             @PathVariable("restaurant_id") final String restaurantUuid,
             @RequestParam("customer_rating") final Double customerRating)
-            throws AuthorizationFailedException, RestaurantNotFoundException, InvalidRatingException, CustomerNotFoundException {
-        customerService.authenticate(authorization);
+            throws AuthorizationFailedException, RestaurantNotFoundException, InvalidRatingException {
+        //Authorize User
+        String accessToken = Utils.getTokenFromAuthorization(authorization);
+        customerService.getCustomer(accessToken);
+
         RestaurantEntity restaurantEntity = restaurantService.restaurantByUUID(restaurantUuid);
         RestaurantEntity updatedRestaurantEntity =
                 restaurantService.updateRestaurantRating(restaurantEntity, customerRating);
         RestaurantUpdatedResponse restaurantUpdatedResponse = new RestaurantUpdatedResponse();
-        restaurantUpdatedResponse.setId(fromString(updatedRestaurantEntity.getUuid()));
+        restaurantUpdatedResponse.setId(UUID.fromString(updatedRestaurantEntity.getUuid()));
         restaurantUpdatedResponse.setStatus("RESTAURANT RATING UPDATED SUCCESSFULLY");
 
         return new ResponseEntity<RestaurantUpdatedResponse>(restaurantUpdatedResponse, HttpStatus.OK);
     }
+
+//    when(mockCustomerService.getCustomer("database_accesstoken2"))
+//            .thenReturn(new CustomerEntity());
+//
+//    final RestaurantEntity restaurantEntity = getRestaurantEntity();
+//    when(mockRestaurantService.restaurantByUUID(restaurantId)).thenReturn(restaurantEntity);
+//
+//    when(mockRestaurantService.updateRestaurantRating(restaurantEntity, 4.5))
+//            .thenReturn(new RestaurantEntity());
 
     /**
      * @param allRestaurants

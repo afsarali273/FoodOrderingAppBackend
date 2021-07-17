@@ -2,6 +2,7 @@ package com.upgrad.FoodOrderingApp.service.dao;
 
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
+import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -61,4 +62,5 @@ public class CustomerDao {
     public void updateCustomer(final CustomerEntity customerEntity) {
         entityManager.merge(customerEntity);
     }
+
 }

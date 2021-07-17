@@ -24,21 +24,21 @@ public class CustomerService {
     @Autowired
     private PasswordCryptographyProvider passwordCryptographyProvider;
 
-    @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerAuthEntity authenticate(final String authorization)
-            throws AuthorizationFailedException {
-        CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthTokenEntity(authorization);
-
-        // Check user is signed in
-        if (customerAuthEntity == null)
-            throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
-
-        // Check User is Signed Out
-        if (customerAuthEntity.getLogoutAt() != null)
-            throw new AuthorizationFailedException(
-                    "ATHR-002", "User is signed out.Sign in first to post a question");
-        return customerAuthEntity;
-    }
+//    @Transactional(propagation = Propagation.REQUIRED)
+//    public CustomerAuthEntity authenticate(final String authorization)
+//            throws AuthorizationFailedException {
+//        CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthTokenEntity(authorization);
+//
+//        // Check user is signed in
+//        if (customerAuthEntity == null)
+//            throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
+//
+//        // Check User is Signed Out
+//        if (customerAuthEntity.getLogoutAt() != null)
+//            throw new AuthorizationFailedException(
+//                    "ATHR-002", "Customer is logged out. Log in again to access this endpoint.");
+//        return customerAuthEntity;
+//    }
 
     /**
      *
@@ -105,32 +105,13 @@ public class CustomerService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerEntity updateCustomer(
-            final String accessToken, CustomerEntity updatedCustomer)
-            throws AuthorizationFailedException {
-
-        CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthTokenEntity(accessToken);
-        if (customerAuthEntity == null)
-            throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
-
-        if (customerAuthEntity.getLogoutAt() != null)
-            throw new AuthorizationFailedException(
-                    "ATHR-002", "Customer is logged out. Log in again to access this endpoint.");
-
-        //If Current time is exceeding 8 hours of Login then ,Session expired
-        if(ZonedDateTime.now().compareTo(customerAuthEntity.getExpiresAt()) > 0)
-            throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
-
-        CustomerEntity customer = customerAuthEntity.getCustomer();
-        customer.setFirstName(updatedCustomer.getFirstName());
-        customer.setLastName(updatedCustomer.getLastName());
-        customerDao.updateCustomer(customer);
-        return customer;
+    public CustomerEntity updateCustomer(CustomerEntity updatedCustomer) {
+        customerDao.updateCustomer(updatedCustomer);
+        return updatedCustomer;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerEntity updateCustomer(
-           CustomerEntity oldCustomer, String oldPassword , String newPassword) throws UpdateCustomerException {
+    public CustomerEntity updateCustomerPassword(String oldPassword , String newPassword,CustomerEntity oldCustomer) throws UpdateCustomerException {
 
         //Check for password weakness
         if(!newPassword.matches("^(?=.*[A-Z])(?=.*[#@$%&*!^])(?=.*[0-9])(?=.*[a-z]).{8,20}$"))
@@ -169,6 +150,13 @@ public class CustomerService {
         return customerAuthEntity;
     }
 
+    /**
+     * This method checks if the token is valid.
+     *
+     * @param authorization for authorisation
+     * @return customer information return
+     * @throws AuthorizationFailedException exception in case customer token invalidated
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerEntity getCustomer(final String authorization)
             throws AuthorizationFailedException{

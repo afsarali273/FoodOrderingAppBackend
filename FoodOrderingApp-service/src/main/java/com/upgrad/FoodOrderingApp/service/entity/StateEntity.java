@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
@@ -55,6 +56,14 @@ public class StateEntity implements Serializable {
     }
 
     public void setStateName(String stateName) {
+        this.stateName = stateName;
+    }
+
+    public StateEntity() {}
+
+    public StateEntity(
+            @NotNull @Size(max = 200) String uuid, @NotNull @Size(max = 30) String stateName) {
+        this.uuid = uuid;
         this.stateName = stateName;
     }
 

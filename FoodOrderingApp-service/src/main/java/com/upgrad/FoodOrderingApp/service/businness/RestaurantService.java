@@ -92,12 +92,8 @@ public class RestaurantService {
 
     Double currentRating = restaurantEntity.getCustomerRating();
     Integer numberCustomersRated = restaurantEntity.getNumberCustomersRated();
-
-
     Double newRating =
             ((currentRating * numberCustomersRated) + currentRating) / (numberCustomersRated + 1);
-
-
     restaurantEntity.setNumberCustomersRated(numberCustomersRated + 1);
     restaurantEntity.setCustomerRating(newRating);
 

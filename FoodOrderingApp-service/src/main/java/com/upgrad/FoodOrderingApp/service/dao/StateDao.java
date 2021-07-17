@@ -27,7 +27,7 @@ public class StateDao {
     }
 
     //Search State
-    public StateEntity getStateByStateUuid(String uuId) {
+    public StateEntity getStateByUUID(String uuId) {
         try {
             return entityManager
                     .createNamedQuery("stateByUuid", StateEntity.class)

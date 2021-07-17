@@ -19,6 +19,7 @@ import com.upgrad.FoodOrderingApp.service.businness.ItemService;
 import com.upgrad.FoodOrderingApp.service.businness.OrderService;
 import com.upgrad.FoodOrderingApp.service.businness.PaymentService;
 import com.upgrad.FoodOrderingApp.service.businness.RestaurantService;
+import com.upgrad.FoodOrderingApp.service.common.Utils;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CouponEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
@@ -30,7 +31,6 @@ import com.upgrad.FoodOrderingApp.service.entity.RestaurantEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AddressNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.CouponNotFoundException;
-import com.upgrad.FoodOrderingApp.service.exception.CustomerNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.ItemNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.PaymentMethodNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.RestaurantNotFoundException;
@@ -86,11 +86,12 @@ public class OrderController {
     public ResponseEntity<CouponDetailsResponse> getCouponByName(
             @RequestHeader("authorization") final String authorization,
             @PathVariable("coupon_name") final String couponName)
-            throws AuthorizationFailedException, CouponNotFoundException {
-       // Authenticate user
-        customerService.authenticate(authorization);
-        CouponEntity couponEntity = orderService.getCouponByCouponName(couponName);
+            throws CouponNotFoundException, AuthorizationFailedException {
+        // Get Authenticated In User
+        String accessToken =  Utils.getTokenFromAuthorization(authorization);
+        customerService.getCustomer(accessToken);
 
+        CouponEntity couponEntity = orderService.getCouponByCouponName(couponName);
         CouponDetailsResponse couponDetailsResponse = new CouponDetailsResponse();
         couponDetailsResponse.setPercent(couponEntity.getPercent());
         couponDetailsResponse.setId(UUID.fromString(couponEntity.getUuid()));
@@ -114,8 +115,9 @@ public class OrderController {
     public ResponseEntity<CustomerOrderResponse> getOrdersByCustomer(
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException {
-        //Get Authenticated Customer
-        CustomerEntity customerEntity = customerService.authenticate(authorization).getCustomer();
+        // Get Authenticated In User
+        String accessToken =  Utils.getTokenFromAuthorization(authorization);
+        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
 
         List<OrderEntity> ordersOfCustomer =
                 orderService.getOrdersByCustomers(customerEntity.getUuid());
@@ -166,7 +168,8 @@ public class OrderController {
             PaymentMethodNotFoundException, RestaurantNotFoundException, ItemNotFoundException {
 
         // Get Authenticated In User
-        CustomerEntity customerEntity = customerService.authenticate(authorization).getCustomer();
+       String accessToken =  Utils.getTokenFromAuthorization(authorization);
+        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
 
         CouponEntity couponEntity =
                 orderService.getCouponByCouponId(saveOrderRequest.getCouponId().toString());
@@ -175,7 +178,7 @@ public class OrderController {
                 paymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
 
         AddressEntity addressEntity =
-                addressService.getAddressByUUID(saveOrderRequest.getAddressId());
+                addressService.getAddressByUUID(saveOrderRequest.getAddressId(),customerEntity);
 
         RestaurantEntity restaurantEntity =
                 restaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString());

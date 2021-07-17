@@ -155,6 +155,15 @@ public class RestaurantEntity implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    return "RestaurantEntity{" +
+            "id=" + id +
+            ", uuid='" + uuid + '\'' +
+            ", restaurantName='" + restaurantName + '\'' +
+            ", photoUrl='" + photoUrl + '\'' +
+            ", customerRating=" + customerRating +
+            ", avgPrice=" + avgPrice +
+            ", numberCustomersRated=" + numberCustomersRated +
+            ", address=" + address +
+            '}';
   }
 }
